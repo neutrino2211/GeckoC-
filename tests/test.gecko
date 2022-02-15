@@ -1,0 +1,83 @@
+package main
+
+ctypealias c_string char*
+ctypealias c_int int
+
+// Single line comment
+declare func printf(format: c_string, args: *) 
+
+// An interface
+interface iDevice {
+	uid: byte[64]
+	name: string
+
+	type: c_int
+}
+
+// An enum
+enum eDeviceType {
+	gamepad = 4
+	keyboard
+	mouse = 12
+	trackpad
+}
+
+// A for loop
+for (const i of integers) {
+	printf("%i", i)
+}
+
+for (const i in integers) {
+	printf("%i", i)
+}
+
+for (const i of [1, 2, 3, 4, 5]) {
+	printf("%i", i)
+}
+
+for (const i in [1, 2, 3, 4, 5]) {
+	printf("%i", i)
+}
+
+// {
+	Multiline comment
+
+	This here is a class in gecko
+} extra
+
+
+class string {
+
+	private let __c_char: c_string
+	func init(self: string) -> void {
+		// comment
+	}
+
+	operator "=" (self:string, val: c_string) -> void {
+		self.__c_char = val
+	}
+}
+
+class String extending string {
+	func init (self: String) -> void {
+		// Another comment
+	}
+}
+
+func calculateThis() -> int {
+	return 20*4
+}
+
+const s: string = "Hello World!!!"
+const e: int = 1+2
+const e2: int = 1+(2*3)
+const e3: int = 30*calculateThis()
+const e4: int = calculateThis()*calculateThis()
+
+let i: int = 80
+
+func main (argc: int, argv: [[string]]) -> void {
+	const operation: string = argv[0]
+
+	printf("", operation)
+}
