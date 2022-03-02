@@ -5,9 +5,10 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-	string txt = Gecko::readfile("../../../tests/test.gecko");
+    Commander* c = new Commander(argc, argv);
+	string txt = Gecko::readfile("../tests/test.gecko");
 	
 	Gecko::Lexer lexer(txt + "\n");
 
@@ -18,5 +19,7 @@ int main()
 	parser.register_handler("const", declarationsHandler);
 	parser.register_handler("let", declarationsHandler);
 	parser.parse();
+    system("pwd");
+    system("read -n1 -r -p \"Press any key to continue...\"");
 	return 0;
 }

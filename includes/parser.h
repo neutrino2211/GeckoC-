@@ -1,4 +1,5 @@
-#pragma once
+#ifndef G_PARSER_H
+#define G_PARSER_H
 
 #include "lexer.h"
 #include <map>
@@ -24,3 +25,5 @@ namespace Gecko {
 	};
 
 }
+
+#endif // G_PARSER_H

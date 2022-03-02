@@ -1,0 +1,14 @@
+{
+    "terminal.integrated.profiles.linux": {
+        "bash" : {
+            "path": "flatpak-spawn",
+            "args": [
+                "--host",
+                "toolbox",
+                "run",
+                "bash"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "bash"
+}

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef G_AST_H
+#define G_AST_H
 #include <string>
 #include "lexer.h"
 
@@ -6,16 +7,16 @@ namespace Gecko {
 
 	namespace AST {
 
-		static struct ast_node_t {
+		struct ast_node_t {
 			std::string type;
 			void* data;
 		};
 
-		static struct class_node_t {
+		struct class_node_t {
 			std::string name;
 		};
 
-		static struct typeref_node_t {
+		struct typeref_node_t {
 			std::string name;
 			bool is_gecko_type;
 
@@ -23,7 +24,7 @@ namespace Gecko {
 			class_node_t* gecko_class;
 		};
 
-		static struct variable_node_t {
+		struct variable_node_t {
 			std::string name;
 			bool is_constant;
 			bool is_nullable;
@@ -39,3 +40,4 @@ namespace Gecko {
 	}
 
 }
+#endif

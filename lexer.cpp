@@ -34,21 +34,26 @@ namespace Gecko {
 			if (squareBraceLevel == 0 && squiglyBraceLevel == 0 && curvedBraceLevel == 0 && !isInQuote) bParse = true;
 			else bParse = false;
 
+			if (bParse == false && squiglyBraceLevel > 0) bIsCodeBlock = true;
+
 			if (*arr == ' ' && bParse && tmp != "") {
+				Gecko::Utils::ltrim(tmp);
 				if (next_node->consumer_label.empty()) {
-					//printf("%s\n", tmp.c_str());
+					// printf("[TMP]%s", tmp.c_str());
 					Utils::ltrim(tmp);
 					next_node->consumer_label = tmp.c_str();
 				}
 				else {
-					//printf(tmp.c_str());
 					Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
 					Gecko::lexer_child_string_t* child = new Gecko::lexer_child_string_t;
+					Gecko::lexer_node_options_t* options = new Gecko::lexer_node_options_t;
 
 					pos->column = column;
 					pos->line = line;
 
 					child->position = pos;
+					child->value = tmp.c_str();
+					child->options = options;
 					next_node->children.push_back(child);
 				}
 
@@ -56,22 +61,37 @@ namespace Gecko {
 				tmp = "";
 			}
 			else if (*arr == '\n' && bParse && tmp != "") {
+				Gecko::Utils::ltrim(tmp);
 				//print_lexer_node(next_node);
 				Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
 				Gecko::lexer_child_string_t* child = new Gecko::lexer_child_string_t;
 
+				// Set the token position
 				pos->column = column;
 				pos->line = line;
-
 				child->position = pos;
 
+				// Set the value of the token
+				child->value = tmp.c_str();
+
+				// Add this last identified token to the node's children vector
 				next_node->children.push_back(child);
+
+				// Make a copy of the completed node
 				lexer_node_t n = *next_node;
 				
+				// Clear the node
 				init_node(next_node);
+
+				// Set the current node's prev as the just completed node
 				next_node->prev = &n;
+				// Set the next of the just completed node to this new node
 				n.next = next_node;
+
+				// Push the completed node to the nodes vector
 				nodes->push_back(n);
+
+				// printf("%s\n", tmp.c_str());
 
 				// tmp has been comitted to a node, reset it
 				tmp = "";
@@ -80,6 +100,8 @@ namespace Gecko {
 				column = 1;
 
 				// Increase the line count
+				line++;
+			} else if (*arr == '\n') {
 				line++;
 			}
 

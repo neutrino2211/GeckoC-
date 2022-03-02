@@ -1,4 +1,3 @@
-#pragma once
 #ifndef G_LEXER_H
 #define G_LEXER_H
 
@@ -11,26 +10,33 @@ using namespace std;
 
 namespace Gecko {
 
-	static struct lexer_position_node_t {
+	struct lexer_position_node_t {
 		uint32_t line;
 		uint32_t column;
 	};
 
-	static struct lexer_child_string_t {
+	struct lexer_node_options_t {
+		bool isCodeBlock;
+	};
+	
+
+	struct lexer_child_string_t {
 		string value;
 		lexer_position_node_t* position;
+		lexer_node_options_t* options;
 	};
 
-	static struct lexer_node_t {
+	struct lexer_node_t {
 		string consumer_label;
 		lexer_node_t* next;
 		lexer_node_t* prev;
 		vector<lexer_child_string_t*> children;
-	} lexer_node;
+	};
 
 	class Lexer {
 	private:
 		bool bParse = true;
+		bool bIsCodeBlock = false;
 		bool bIgnoreNextChar = false;
 		int curvedBraceLevel = 0;
 		int squiglyBraceLevel = 0;
