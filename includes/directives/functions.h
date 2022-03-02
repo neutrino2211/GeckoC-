@@ -1,0 +1,6 @@
+#ifndef G_DECLARATIONS_FUNCTIONS_H
+#define G_DECLARATIONS_FUNCTIONS_H
+
+
+
+#endif
