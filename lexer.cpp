@@ -1,19 +1,21 @@
+#include <algorithm>
 #include "includes/lexer.h"
 
 using namespace std;
 
 namespace Gecko {
 
-	Lexer::Lexer(string input) {
+	Lexer::Lexer(string input, vector<char> forcedTokenizedChars) {
 		mInput = input;
+		mForcedTokenizedChars = forcedTokenizedChars;
 	}
 
 	vector<lexer_node_t>* Lexer::parse() {
 		char* arr = Utils::string_to_chr_array(mInput);
 		string tmp = "";
 		vector<lexer_node_t>* nodes = new vector<lexer_node_t>();
-		lexer_node_t* next_node = new lexer_node_t;
-		init_node(next_node);
+		lexer_node_t* current_node = new lexer_node_t;
+		init_node(current_node);
 
 
 		uint32_t line = 1;
@@ -36,65 +38,122 @@ namespace Gecko {
 
 			if (bParse == false && squiglyBraceLevel > 0) bIsCodeBlock = true;
 
-			if (*arr == ' ' && bParse && tmp != "") {
+			if (std::find(mForcedTokenizedChars.begin(), mForcedTokenizedChars.end(), *arr) != mForcedTokenizedChars.end() && bParse) {
+
 				Gecko::Utils::ltrim(tmp);
-				if (next_node->consumer_label.empty()) {
+				Gecko::lexer_position_node_t* previous_pos = new Gecko::lexer_position_node_t;
+				Gecko::lexer_position_node_t* current_token_pos = new Gecko::lexer_position_node_t;
+				Gecko::lexer_node_options_t* options = new Gecko::lexer_node_options_t;
+
+				Gecko::lexer_node_t* next = new Gecko::lexer_node_t;
+				Gecko::lexer_node_t* previous = new Gecko::lexer_node_t;
+
+				previous_pos->column = column-1;
+				previous_pos->line = line;
+
+				current_token_pos->column = column;
+				current_token_pos->line = line;
+
+
+				previous->value = current_node->value;
+				previous->position = previous_pos;
+				previous->options = options;
+				previous->prev = current_node->prev;
+				previous->next = current_node;
+
+				current_node->value = tmp.substr(0, tmp.length()).c_str();
+				current_node->position = current_token_pos;
+				current_node->options = options;
+				current_node->prev = previous;
+				current_node->next = next;
+
+				next->prev = current_node;
+				next->value = *arr;
+
+				nodes->push_back(*previous);
+				nodes->push_back(*current_node);
+
+				current_node = next;
+
+				tmp = "";
+				arr++;
+			} else if (*arr == ' ' && bParse && tmp != "") {
+				Gecko::Utils::ltrim(tmp);
+				
+				Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
+				Gecko::lexer_node_options_t* options = new Gecko::lexer_node_options_t;
+
+				pos->column = column;
+				pos->line = line;
+
+				options->isCodeBlock = bIsCodeBlock;
+				
+				if (current_node->value.empty()) {
 					// printf("[TMP]%s", tmp.c_str());
 					Utils::ltrim(tmp);
-					next_node->consumer_label = tmp.c_str();
+					current_node->value = tmp.c_str();
+					current_node->position = pos;
+					current_node->options = options;
 				}
 				else {
-					Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
-					Gecko::lexer_child_string_t* child = new Gecko::lexer_child_string_t;
-					Gecko::lexer_node_options_t* options = new Gecko::lexer_node_options_t;
 
-					pos->column = column;
-					pos->line = line;
+					Gecko::lexer_node_t* next = new Gecko::lexer_node_t;
 
-					child->position = pos;
-					child->value = tmp.c_str();
-					child->options = options;
-					next_node->children.push_back(child);
+					next->value = tmp.c_str();
+					next->position = pos;
+					next->options = options;
+
+					current_node->next = next;
+					next->prev = current_node;
+
+					nodes->push_back(*current_node);
+
+					current_node = next;
 				}
 
 				// tmp has been comitted to a node, reset it
 				tmp = "";
+				bIsCodeBlock = false;
 			}
 			else if (*arr == '\n' && bParse && tmp != "") {
 				Gecko::Utils::ltrim(tmp);
-				//print_lexer_node(next_node);
+				//print_lexer_node(current_node);
 				Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
-				Gecko::lexer_child_string_t* child = new Gecko::lexer_child_string_t;
+				Gecko::lexer_node_t* next = new Gecko::lexer_node_t;
 
 				// Set the token position
 				pos->column = column;
 				pos->line = line;
-				child->position = pos;
+				next->position = pos;
 
 				// Set the value of the token
-				child->value = tmp.c_str();
+				next->value = tmp.c_str();
 
 				// Add this last identified token to the node's children vector
-				next_node->children.push_back(child);
+				// current_node->children.push_back(child);
 
 				// Make a copy of the completed node
-				lexer_node_t n = *next_node;
+				// lexer_node_t n = *current_node;
 				
 				// Clear the node
-				init_node(next_node);
+				// init_node(current_node);
 
 				// Set the current node's prev as the just completed node
-				next_node->prev = &n;
+				next->prev = current_node;
 				// Set the next of the just completed node to this new node
-				n.next = next_node;
+				current_node->next = next;
 
 				// Push the completed node to the nodes vector
-				nodes->push_back(n);
+				nodes->push_back(*current_node);
+
+				current_node = next;
 
 				// printf("%s\n", tmp.c_str());
 
 				// tmp has been comitted to a node, reset it
 				tmp = "";
+
+				bIsCodeBlock = false;
 
 				// Reset the column count to 1 since we are on a new line
 				column = 1;
@@ -119,32 +178,31 @@ namespace Gecko {
 		}
 
 		Gecko::lexer_position_node_t* pos = new Gecko::lexer_position_node_t;
-		Gecko::lexer_child_string_t* child = new Gecko::lexer_child_string_t;
+		Gecko::lexer_node_options_t* options = new Gecko::lexer_node_options_t;
 
 		pos->column = column;
 		pos->line = line;
 
-		child->position = pos;
+		current_node->position = pos;
 
-		next_node->children.push_back(child);
+		options->isCodeBlock = bIsCodeBlock;
+
+		current_node->options = options;
+
+		bIsCodeBlock = false;
 
 		return nodes;
 	}
 
 	char* lexer_node_to_string(lexer_node_t* node) {
 		char* s = new char[1024];
-		sprintf(s, "-> %s", node->consumer_label.c_str());
+		sprintf(s, "-> %s", node->value.c_str());
 		return s;
 	};
 
 	void print_lexer_node(lexer_node_t* node) {
 		lexer_node_t* n = node;
-		printf("Directive: %s\n", n->consumer_label.c_str());
-		vector<Gecko::lexer_child_string_t*> children = n->children;
-
-		for (int i = 0; i < children.size(); i++) {
-			printf("[%i] %s\n", i, children[i]->value.c_str());
-		}
+		printf("Directive: %s\n", n->value.c_str());
 		printf("\n");
 	};
 }

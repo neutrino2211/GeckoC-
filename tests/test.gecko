@@ -39,6 +39,10 @@ for (const i in [1, 2, 3, 4, 5]) {
 	printf("%i", i)
 }
 
+if ("H" in "Hello World!") {
+	run_function()
+}
+
 // {
 	Multiline comment
 
@@ -46,8 +50,8 @@ for (const i in [1, 2, 3, 4, 5]) {
 } extra
 
 
-class string {
-
+private strict class string 
+{
 	private let __c_char: c_string
 	func init(self: string) -> void {
 		// comment

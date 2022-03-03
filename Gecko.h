@@ -10,8 +10,5 @@
 #include "includes/lexer.h"
 #include "includes/readfile.h"
 #include "includes/parser.h"
-#include "includes/directives.h"
-
-#include "includes/directives/declarations.h"
 
 #include "includes/commander.h"

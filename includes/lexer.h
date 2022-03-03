@@ -18,19 +18,13 @@ namespace Gecko {
 	struct lexer_node_options_t {
 		bool isCodeBlock;
 	};
-	
-
-	struct lexer_child_string_t {
-		string value;
-		lexer_position_node_t* position;
-		lexer_node_options_t* options;
-	};
 
 	struct lexer_node_t {
-		string consumer_label;
+		string value;
 		lexer_node_t* next;
 		lexer_node_t* prev;
-		vector<lexer_child_string_t*> children;
+		lexer_position_node_t* position;
+		lexer_node_options_t* options;
 	};
 
 	class Lexer {
@@ -44,17 +38,17 @@ namespace Gecko {
 		bool isInQuote = false;
 
 		string mInput = "";
+		vector<char> mForcedTokenizedChars;
 	public:
 
-		Lexer(string input);
+		Lexer(string input, vector<char> forcedTokenizedChars);
 
 		vector<lexer_node_t>* parse();
 
 	};
 
 	static void init_node(lexer_node_t* node) {
-		node->consumer_label = string();
-		node->children = vector<lexer_child_string_t*>();
+		node->value = string();
 		node->next = nullptr;
 		node->prev = nullptr;
 	}
