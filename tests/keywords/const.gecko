@@ -1,0 +1,4 @@
+package keywords
+
+private const hello = "Hello World"
+const number = 2

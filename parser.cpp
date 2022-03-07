@@ -10,14 +10,21 @@ namespace Gecko {
 		handlers[directive] = h;
 	}
 
+	void Parser::registerKeyword(keyword* k) {
+		keywords[k->name] = k;
+	}
+
 	void Parser::parse() {
+		vector<keyword*> matchedKeywords = {};
 		for (lexer_node_t node : *mNodes) {
 
 			if (node.value != "") {
-				ParserUtils::DirectiveHandler h = handlers[node.value];
+				keyword* k = keywords[node.value];
 
-				if (h) h(node);
+				if (k) printf("chould consume: %i\n", k->shouldConsume(&node));
 				else printf("Error: %s has no handler\n", node.value.c_str());
+
+
 			}
 		}
 	}

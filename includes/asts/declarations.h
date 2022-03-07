@@ -8,6 +8,7 @@ namespace Gecko {
 
 		struct declarations_ast_node_t {
 			bool is_constant;
+			bool is_nullable;
 			std::string type_string;
 			ast_node_t* expression;
 		};

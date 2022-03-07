@@ -12,3 +12,5 @@
 #include "includes/parser.h"
 
 #include "includes/commander.h"
+
+#include "includes/commands/compile.h"

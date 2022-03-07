@@ -49,6 +49,24 @@ if ("H" in "Hello World!") {
 	This here is a class in gecko
 } extra
 
+class sizeable {
+    companion getter size (self: unknown) -> number {
+        return std.C.sizeof(self)
+    }
+}
+
+class number extends sizeable {}
+
+private strict class Array takes [T = number] {
+
+    assert T.is(sizeable)
+
+    private let size: number = 0;
+
+    func init (self: Array) {
+        self.size = T.size
+    }
+}
 
 private strict class string 
 {
@@ -72,16 +90,25 @@ func calculateThis() -> int {
 	return 20*4
 }
 
+private async const apiRequest = request.get (
+    "http://www.google.com",
+    {
+        noCors: true
+    }
+)
+
 const s: string = "Hello World!!!"
 const e: int = 1+2
 const e2: int = 1+(2*3)
 const e3: int = 30*calculateThis()
 const e4: int = calculateThis()*calculateThis()
 
+const s2 = "Hello World!! 2"
+
 let i: int = 80
 
 func main (argc: int, argv: [[string]]) -> void {
 	const operation: string = argv[0]
-
+	const response: request.Response = apiRequest.get();
 	printf("", operation)
 }

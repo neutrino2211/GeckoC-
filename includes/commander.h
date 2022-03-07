@@ -7,10 +7,48 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <map>
 
 typedef std::function<bool(bool)> BooleanCommandable;
-typedef std::function<bool(std::string)> NumberCommandable;
+typedef std::function<bool(int)> NumberCommandable;
+typedef std::function<bool(float)> FloatCommandable;
 typedef std::function<bool(std::string)> StringCommandable;
+
+enum OptionTypes {
+    NumberOption,
+    FloatOption,
+    StringOption,
+    BooleanOption,
+};
+
+struct OptionListener
+{
+    OptionTypes type;
+    std::string help;
+    void* optionListener;
+    bool hasListener;
+};
+
+class Command {
+
+    protected:
+    
+    std::string name = "";
+    std::string usage = "";
+    std::string description = "";
+
+    public:
+    std::map<std::string, OptionListener*> options;
+    std::vector<std::string> positionals;
+    std::map<std::string, std::string> values;
+
+    std::string buildHelp();
+
+    Command();
+    void registerOption(std::string name, OptionListener* option);
+    void registerPositionals(std::vector<std::string> positionals);
+    virtual void run();
+};
 
 /**
  * @todo write docs
@@ -19,12 +57,15 @@ class Commander
 {
 
     std::vector<std::string> arguments;
+    std::map<std::string, Command*> commands;
+    std::map<std::string, OptionListener*> listeners;
+
+    std::map<std::string, std::string> values;
 public:
     Commander(int argc, char** args);
-    void registerBooleanOption(std::string name, BooleanCommandable func);
-    void registerNumberOption(std::string name, NumberCommandable func);
-    void registerStringOption(std::string name, StringCommandable func);
-    std::vector<std::string> parse();
+    void registerCommand(std::string name, Command* cmd);
+    void registerOption(std::string name, OptionListener* listener);
+    void parse();
 };
 
 #endif // COMMANDER_H

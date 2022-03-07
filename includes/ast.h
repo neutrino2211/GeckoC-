@@ -1,6 +1,7 @@
 #ifndef G_AST_H
 #define G_AST_H
 #include <string>
+#include <map>
 #include "lexer.h"
 
 namespace Gecko {
@@ -37,6 +38,12 @@ namespace Gecko {
 			bool isValidDeclaration(Gecko::lexer_node_t*);
 			bool isImplicitDeclaration(Gecko::lexer_node_t*);
 		}
+
+		class Ast {
+		private:
+			std::map<std::string, class_node_t*> classes;
+			
+		};
 	}
 
 }
