@@ -23,6 +23,9 @@ add_executable (
     "includes/parser.h"
     "includes/asts/declarations.h"
     "colors.cpp"
+    "keywords.cpp"
+    "errors.cpp"
+    "keyword.cpp"
     )
 
 # TODO: Add tests and install targets if needed.

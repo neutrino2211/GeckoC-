@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "keyword.h"
 
 typedef std::function<bool(bool)> BooleanCommandable;
 typedef std::function<bool(int)> NumberCommandable;

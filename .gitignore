@@ -365,3 +365,4 @@ FodyWeavers.xsd
 build
 .kdev4
 *.kdev4
+CMakeFiles

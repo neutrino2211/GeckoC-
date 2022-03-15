@@ -10,6 +10,7 @@
 #include "includes/lexer.h"
 #include "includes/readfile.h"
 #include "includes/parser.h"
+#include "includes/keywords.h"
 
 #include "includes/commander.h"
 

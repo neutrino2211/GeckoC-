@@ -24,7 +24,7 @@ void* getValue(OptionTypes type, std::string value, std::function<void(std::exce
         {
             std::cerr << "GetValue: " << e.what() << '\n';
             if (onError != nullptr) onError(&e);
-            exit(Gecko::Errors::CommandLineParseError);
+            exit(Gecko::Error::CommandLineParseError);
         }
         
         break;
@@ -39,7 +39,7 @@ void* getValue(OptionTypes type, std::string value, std::function<void(std::exce
         {
             std::cerr << "GetValue: " << e.what() << '\n';
             if (onError != nullptr) onError(&e);
-            exit(Gecko::Errors::CommandLineParseError);
+            exit(Gecko::Error::CommandLineParseError);
         }
         break;
 

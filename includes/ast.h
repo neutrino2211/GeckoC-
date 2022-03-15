@@ -42,6 +42,7 @@ namespace Gecko {
 		class Ast {
 		private:
 			std::map<std::string, class_node_t*> classes;
+			std::map<std::string, variable_node_t*> variables;
 			
 		};
 	}

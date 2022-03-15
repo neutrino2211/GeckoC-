@@ -1,4 +1,7 @@
 #include "includes/parser.h"
+#include "includes/errors.h"
+
+Gecko::Error::Scope* scope = new Gecko::Error::Scope("Parser");
 
 namespace Gecko {
 
@@ -10,21 +13,35 @@ namespace Gecko {
 		handlers[directive] = h;
 	}
 
-	void Parser::registerKeyword(keyword* k) {
+	void Parser::registerKeyword(Keyword* k) {
 		keywords[k->name] = k;
 	}
 
 	void Parser::parse() {
-		vector<keyword*> matchedKeywords = {};
+		Keyword* matchedKeyword = nullptr;
 		for (lexer_node_t node : *mNodes) {
 
 			if (node.value != "") {
-				keyword* k = keywords[node.value];
+				Keyword* k = keywords[node.value];
 
-				if (k) printf("chould consume: %i\n", k->shouldConsume(&node));
-				else printf("Error: %s has no handler\n", node.value.c_str());
+				if (!k) {
+					printf("Error: %s has no handler\n", node.value.c_str());
+					continue;
+				};
 
+				if (matchedKeyword != nullptr) {
+					std::string message = "Not expecting keyword \"" + node.value + "\" at this location\n";
+					// sprintf(message, node.value.c_str());
+					// printf("ERROR\n");
+					scope->raise(Gecko::Error::SourceFileParsingError, message.c_str(), "SyntaxError", &node); 
+				}
 
+				if (k->shouldConsume(&node)) {
+					// matchedKeyword = k;
+					// printf("should consume: %i\n", k->shouldConsume(&node));
+					k->rules->Validate(&node);
+					Gecko::Utils::printMap(k->data);
+				}
 			}
 		}
 	}

@@ -10,6 +10,11 @@ namespace Gecko {
 		mForcedTokenizedChars = forcedTokenizedChars;
 	}
 
+
+	string Lexer::source() {
+		return mInput;
+	}
+
 	vector<lexer_node_t>* Lexer::parse() {
 		char* arr = Utils::string_to_chr_array(mInput);
 		string tmp = "";
@@ -60,6 +65,7 @@ namespace Gecko {
 				previous->options = options;
 				previous->prev = current_node->prev;
 				previous->next = current_node;
+				previous->lexer = this; // Set reference to lexer instance to access source
 
 				current_node->value = tmp.substr(0, tmp.length()).c_str();
 				current_node->position = current_token_pos;
@@ -69,6 +75,7 @@ namespace Gecko {
 
 				next->prev = current_node;
 				next->value = *arr;
+				next->lexer = this; // Set reference to lexer instance to access source
 
 				nodes->push_back(*previous);
 				nodes->push_back(*current_node);
@@ -102,6 +109,7 @@ namespace Gecko {
 					next->value = tmp.c_str();
 					next->position = pos;
 					next->options = options;
+					next->lexer = this; // Set reference to lexer instance to access source
 
 					current_node->next = next;
 					next->prev = current_node;
@@ -125,6 +133,7 @@ namespace Gecko {
 				pos->column = column;
 				pos->line = line;
 				next->position = pos;
+				next->lexer = this; // Set reference to lexer instance to access source
 
 				// Set the value of the token
 				next->value = tmp.c_str();
@@ -192,6 +201,23 @@ namespace Gecko {
 		bIsCodeBlock = false;
 
 		return nodes;
+	}
+
+	string Lexer::get_node_location_string(lexer_node_t* node) {
+		lexer_position_node_t* pos = node->position;
+
+		std::vector<std::string>* r = Gecko::Utils::split(mInput, "\n");
+
+		std::string current_line = r->at(pos->line);
+
+		if (pos->line - 1 > 0) {
+			current_line = r->at(pos->line - 1) + current_line;
+		}
+
+		if (pos->line + 1 > 0) {
+			current_line = current_line + r->at(pos->line + 1);
+		}
+		return current_line;
 	}
 
 	char* lexer_node_to_string(lexer_node_t* node) {

@@ -10,6 +10,8 @@ using namespace std;
 
 namespace Gecko {
 
+	class Lexer;
+
 	struct lexer_position_node_t {
 		uint32_t line;
 		uint32_t column;
@@ -25,6 +27,7 @@ namespace Gecko {
 		lexer_node_t* prev;
 		lexer_position_node_t* position;
 		lexer_node_options_t* options;
+		Lexer* lexer;
 	};
 
 	class Lexer {
@@ -44,7 +47,8 @@ namespace Gecko {
 		Lexer(string input, vector<char> forcedTokenizedChars);
 
 		vector<lexer_node_t>* parse();
-
+		string get_node_location_string(lexer_node_t* node);
+		string source();
 	};
 
 	static void init_node(lexer_node_t* node) {
