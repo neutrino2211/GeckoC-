@@ -1,5 +1,3 @@
-package keywords
 
-private const hello: string = "Hello World"
-const number: number = 2
-const explicit: number = 3
+const explicit: number = [ 20 + 43 ]
+const implicit = 42

@@ -46,7 +46,7 @@ namespace Gecko {
 
 		Lexer(string input, vector<char> forcedTokenizedChars);
 
-		vector<lexer_node_t>* parse();
+		vector<lexer_node_t*>* parse();
 		string get_node_location_string(lexer_node_t* node);
 		string source();
 	};

@@ -4,12 +4,26 @@ GeckoConst::GeckoConst() {
     name = "const";
     modifiers = { {"private", "public", "protected"} };
     // const hello: string = "Hello World"
-    rules
-    ->Capture("name")
-    ->Expect(":")
-    ->Capture("type")
-    ->Or("=")
+
+    KeywordRules* implicitRules = new KeywordRules(this);
+    KeywordRules* explicitRules = new KeywordRules(this);
+
+    implicitRules
+    ->Expect("=")
     ->CaptureUntilNext("expression");
+
+    explicitRules
+    ->Next()
+    ->Capture("type")
+    ->Expect("=")
+    ->CaptureUntilNext("expression");
+
+    rules
+    ->Next()
+    ->Capture("name")
+    ->If(":", explicitRules)
+    ->Or("=", implicitRules)
+    ->EndIf();
 }
 
 bool GeckoConst::shouldAwaitCodeBlock() {
@@ -17,17 +31,7 @@ bool GeckoConst::shouldAwaitCodeBlock() {
 }
 
 bool GeckoConst::shouldConsume(Gecko::lexer_node_t* node) {
-    bool isImplicit = node->next->next->value == "=";
-    std::string type = "";
-
-    if (!isImplicit) {
-        type = node->next->next->next->value;
-        printf("Help: %s\n", node->next->next->next->value.c_str());
-    }
-
-    printf("type: %s\n", type.c_str());
-
-    return isImplicit;
+    return true;
 }
 
 void GeckoConst::processNode(Gecko::AST::ast_node_t* node) {

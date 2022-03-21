@@ -14,12 +14,12 @@ namespace Gecko {
 	class Parser {
 
 	private:
-		vector<lexer_node_t>* mNodes;
+		vector<lexer_node_t*>* mNodes;
 		map<string, Keyword*> keywords;
 		map<string, ParserUtils::DirectiveHandler> handlers;
 
 	public:
-		Parser(vector<lexer_node_t>* nodes);
+		Parser(vector<lexer_node_t*>* nodes);
 
 		void register_handler(string directive, ParserUtils::DirectiveHandler h);
 		void registerKeyword(Keyword* k);

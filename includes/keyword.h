@@ -11,6 +11,7 @@ class Keyword;
 
 class KeywordRules {
     std::vector<std::string> instructions;
+    std::vector<KeywordRules*> branches;
     Keyword* parent;
     Gecko::Error::Scope* error;
     public:
@@ -19,7 +20,10 @@ class KeywordRules {
 
     KeywordRules* Capture(std::string keywordStorageKey);
     KeywordRules* Expect(std::string token);
-    KeywordRules* Or(std::string token);
+    KeywordRules* If(std::string token, KeywordRules* rules);
+    KeywordRules* Or(std::string token, KeywordRules* rules);
+    KeywordRules* EndIf();
+    KeywordRules* Next();
     KeywordRules* CaptureBlock(std::string keywordStorageKey);
     KeywordRules* CaptureUntilNext(std::string keywordStorageKey);
 

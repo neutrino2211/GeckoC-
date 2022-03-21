@@ -15,10 +15,10 @@ namespace Gecko {
 		return mInput;
 	}
 
-	vector<lexer_node_t>* Lexer::parse() {
+	vector<lexer_node_t*>* Lexer::parse() {
 		char* arr = Utils::string_to_chr_array(mInput);
 		string tmp = "";
-		vector<lexer_node_t>* nodes = new vector<lexer_node_t>();
+		vector<lexer_node_t*>* nodes = new vector<lexer_node_t*>();
 		lexer_node_t* current_node = new lexer_node_t;
 		init_node(current_node);
 
@@ -72,13 +72,16 @@ namespace Gecko {
 				current_node->options = options;
 				current_node->prev = previous;
 				current_node->next = next;
+				current_node->lexer = this; // Set reference to lexer instance to access source
 
 				next->prev = current_node;
 				next->value = *arr;
 				next->lexer = this; // Set reference to lexer instance to access source
 
-				nodes->push_back(*previous);
-				nodes->push_back(*current_node);
+				// printf("\'%s\' \'%s\' \'%s\'\n", previous->value.c_str(), current_node->value.c_str(), next->value.c_str());
+
+				nodes->push_back(previous);
+				nodes->push_back(current_node);
 
 				current_node = next;
 
@@ -114,7 +117,7 @@ namespace Gecko {
 					current_node->next = next;
 					next->prev = current_node;
 
-					nodes->push_back(*current_node);
+					nodes->push_back(current_node);
 
 					current_node = next;
 				}
@@ -153,7 +156,7 @@ namespace Gecko {
 				current_node->next = next;
 
 				// Push the completed node to the nodes vector
-				nodes->push_back(*current_node);
+				nodes->push_back(current_node);
 
 				current_node = next;
 

@@ -43,7 +43,7 @@ namespace Commands {
             std::string content = Gecko::readfile(file.c_str());
             Gecko::Lexer* lexer = new Gecko::Lexer(content + "\n\n", {':', '=', ';'});
 
-            vector<Gecko::lexer_node_t>* result = lexer->parse();
+            vector<Gecko::lexer_node_t*>* result = lexer->parse();
             Gecko::Parser parser(result);
 
             parser.registerKeyword(new GeckoConst);
