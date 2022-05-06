@@ -2,7 +2,7 @@
 const explicit: number = [ 20 + 43 ]
 const implicit = 42
 
-private const access_from_only_this_package: string = "
+private const access_from_only_this_file: string = "
     Multiline string
 "
 
