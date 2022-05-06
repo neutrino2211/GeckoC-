@@ -5,6 +5,10 @@ KeywordRules::KeywordRules (Keyword* k) {
     error = new Gecko::Error::Scope(parent->name.c_str());
 }
 
+std::vector<std::string> KeywordRules::GetInstructions() {
+    return instructions;
+}
+
 KeywordRules* KeywordRules::Capture(std::string store) {
     instructions.push_back("s " + store);
 
@@ -39,6 +43,10 @@ KeywordRules* KeywordRules::Next() {
     return this;
 }
 
+void KeywordRules::End() {
+    instructions.push_back("t ");
+}
+
 KeywordRules* KeywordRules::CaptureUntilNext(std::string store) {
     instructions.push_back("u " + store);
 
@@ -51,27 +59,31 @@ KeywordRules* KeywordRules::CaptureBlock(std::string store) {
     return this;
 }
 
-bool KeywordRules::Validate(Gecko::lexer_node_t* node) {
-    Gecko::lexer_node_t* l_node = node; 
+bool KeywordRules::Validate(Gecko::lexer_node_t& node) {
+    Gecko::lexer_node_t* l_node = &node; 
     Gecko::lexer_node_t* encounteredErrorNode = nullptr;
     uint16_t branch = 0;
     bool evaluateBranches = true;
     
+    printf("loop\n");
     for (auto instruction : instructions) {
         if (encounteredErrorNode != nullptr) break;
-        printf("%s %i\n", instruction.c_str(), encounteredErrorNode == nullptr);
+        printf("[%s] [%s] [%i]\n", instruction.c_str(), l_node->value.c_str(), encounteredErrorNode == nullptr);
 
         std::string value = instruction.substr(2);
         if (instruction[0] == 's') parent->data[value] = l_node->value;
         else if(instruction[0] == 'n') ; // Do nothing
         else if (instruction[0] == 'e' && value != l_node->value) encounteredErrorNode = &(*l_node) ; // Copy node for local use
         else if ((instruction[0] == 'o' || instruction[0] == 'i') && evaluateBranches) {
-            if(value != l_node->value) {
+            printf("Pre-error %s %s\n", l_node->value.c_str(), value.c_str());
+            if(value != l_node->value && branch == branches.size() - 1) {
                 encounteredErrorNode = &(*l_node); // Copy node for local use
-            } else {
-                auto branch_valid = branches.at(branch)->Validate(l_node);
+            } else if (value == l_node->value) {
+                auto branch_valid = branches.at(branch)->Validate(*l_node);
                 if(!branch_valid) encounteredErrorNode = &(*l_node);
                 evaluateBranches = false;
+            } else {
+                l_node = l_node->prev;
             }
             branch++;
 
@@ -89,9 +101,14 @@ bool KeywordRules::Validate(Gecko::lexer_node_t* node) {
             } else {
                 parent->data[value] += " " + l_node->value;
             }
+            printf("end u\n");
+        } else if (instruction[0] == 't') {
+            node = *l_node;
+            printf("endloop\n");
+            return true;
         }
 
-        l_node = l_node->next;
+        if (evaluateBranches && l_node->next != nullptr) l_node = l_node->next;
     }
 
     if (encounteredErrorNode != nullptr) {
@@ -102,5 +119,6 @@ bool KeywordRules::Validate(Gecko::lexer_node_t* node) {
         );
         return false;
     }
+
     return true;
 }

@@ -231,7 +231,10 @@ namespace Gecko {
 
 	void print_lexer_node(lexer_node_t* node) {
 		lexer_node_t* n = node;
-		printf("Directive: %s\n", n->value.c_str());
+		while (node != nullptr) {
+			printf("Directive: %s\n", n->value.c_str());
+			node = node->next;
+		}
 		printf("\n");
 	};
 }

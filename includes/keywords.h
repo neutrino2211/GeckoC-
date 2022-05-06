@@ -8,11 +8,29 @@ class GeckoConst : public Keyword {
     public:
     GeckoConst();
 
-    bool shouldAwaitCodeBlock() override;
-    void processNode(Gecko::AST::ast_node_t* node) override;
-    bool shouldConsume(Gecko::lexer_node_t* node) override;
+    Keyword* New() override;
 };
 
+class GeckoPrivateModifier : public Keyword {
+    public:
+    GeckoPrivateModifier();
+
+    Keyword* New() override;
+};
+
+class GeckoPublicModifier : public Keyword {
+    public:
+    GeckoPublicModifier();
+
+    Keyword* New() override;
+};
+
+class GeckoProtectedModifier : public Keyword {
+    public:
+    GeckoProtectedModifier();
+
+    Keyword* New() override;
+};
 
 
 #endif

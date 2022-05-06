@@ -2,7 +2,14 @@
 #include "includes/errors.h"
 
 Gecko::Error::Scope* scope = new Gecko::Error::Scope("Parser");
-
+template<typename K, typename V>
+		std::ostream &operator<<(std::ostream &os,
+								const std::map<K, V> &m) {
+			for (const std::pair<K, V> &p: m) {
+				os << "{" << p.first << ": " << p.second << "}\n";
+			}
+			return os;
+		}
 namespace Gecko {
 
 	Parser::Parser(vector<lexer_node_t*>* nodes) {
@@ -44,16 +51,30 @@ namespace Gecko {
 		}
 
 		// mNodes = lNodes;
-
-		for (lexer_node_t* node : *lNodes) {
-
+		lexer_node_t* node = lNodes->at(0);
+		// print_lexer_node(node);
+		while (node->next != nullptr) {
+			printf("Node: %s\n", node->value.c_str());
 			if (node->value != "") {
-				Keyword* k = keywords[node->value];
+				Keyword* k = ((Keyword*) keywords[node->value]);
 
 				if (!k) {
-					printf("Error: %s -> %s has no handler\n", node->value.c_str(), node->next->value.c_str());
-					continue;
+					scope->raise(
+						Gecko::Error::SourceFileParsingError,
+						("\"" + node->value + "\" is not a valid keyword").c_str(),
+						"InvalidKeyword",
+						node
+					);
+					return;
 				};
+
+				k = k->New();
+
+				if (k->isModifier) {
+					activeModifiers.push_back(k);
+					node = node->next;
+					continue;
+				}
 
 				if (matchedKeyword != nullptr) {
 					std::string message = "Not expecting keyword \"" + node->value + "\" at this location\n";
@@ -65,11 +86,28 @@ namespace Gecko {
 				if (k->name == node->value) {
 					// matchedKeyword = k;
 					// printf("should consume: %i\n", k->shouldConsume(&node));
-					k->rules->Validate(node);
+					printf("START\n");
+					k->rules->Validate(*node);
+					// for (auto i : k->rules->GetInstructions()) {
+					// 	printf("Instructions: %s [%s]\n", i.c_str(), node->value.c_str());
+					// 	node = node->next;
+					// }
+					for (auto mod : activeModifiers) {
+						k->modifierData[mod->name] = true;
+					}
+
 					printf("MAP\n");
-					Gecko::Utils::printMap(k->data);
+					// Gecko::Utils::printMap<std::string, std::string>(k->data);
+					std::cout << k->data;
+					std::cout << k->modifierData;
+
+					activeModifiers = {};
 				}
 			}
+
+			// printf("%i\n\n", node == nullptr);
+			// node = node->next;
+			// printf("%i\n\n", node == nullptr);
 		}
 	}
 }

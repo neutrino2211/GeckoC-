@@ -362,7 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-build
+builddir
 .kdev4
 *.kdev4
 CMakeFiles

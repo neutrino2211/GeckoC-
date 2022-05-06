@@ -2,6 +2,7 @@
 #include <algorithm> 
 #include <cctype>
 #include <locale>
+#include <iostream>
 #include "includes/utils.h"
 
 using namespace std;
@@ -52,13 +53,22 @@ namespace Gecko {
 			return r;
 		}
 
-		void printMap (std::map<std::string, std::string> map) {
+		template<typename K, typename V> void printMap (std::map<K, V> const& map) {
 			printf("{\n");
 			for(const auto& elem : map) {
-				printf("\"%s\": \"%s\",\n", elem.first.c_str(), elem.second.c_str());
+				std::cout << elem.first << ":" << elem.second << ",\n";
 			}
-			printf("}");
+			printf("}\n");
 			return;
+		}
+
+		template<typename K, typename V>
+		std::ostream &operator<<(std::ostream &os,
+								const std::map<K, V> &m) {
+			for (const std::pair<K, V> &p: m) {
+				os << "{" << p.first << ": " << p.second << "}\n";
+			}
+			return os;
 		}
 
 	}

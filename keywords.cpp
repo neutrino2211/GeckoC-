@@ -3,6 +3,7 @@
 GeckoConst::GeckoConst() {
     name = "const";
     modifiers = { {"private", "public", "protected"} };
+    isModifier = false;
     // const hello: string = "Hello World"
 
     KeywordRules* implicitRules = new KeywordRules(this);
@@ -10,30 +11,61 @@ GeckoConst::GeckoConst() {
 
     implicitRules
     ->Expect("=")
-    ->CaptureUntilNext("expression");
+    ->CaptureUntilNext("expression")
+    ->End();
 
     explicitRules
     ->Next()
     ->Capture("type")
     ->Expect("=")
-    ->CaptureUntilNext("expression");
+    ->CaptureUntilNext("expression")
+    ->End();
 
     rules
     ->Next()
     ->Capture("name")
     ->If(":", explicitRules)
     ->Or("=", implicitRules)
-    ->EndIf();
+    ->EndIf()
+    ->End();
 }
 
-bool GeckoConst::shouldAwaitCodeBlock() {
-    return false;
+Keyword* GeckoConst::New() {
+    return new GeckoConst();
 }
 
-bool GeckoConst::shouldConsume(Gecko::lexer_node_t* node) {
-    return true;
+GeckoPrivateModifier::GeckoPrivateModifier() {
+    isModifier = true;
+
+    name = "private";
+
+    rules->End();
 }
 
-void GeckoConst::processNode(Gecko::AST::ast_node_t* node) {
-    return;
+Keyword* GeckoPrivateModifier::New() {
+    return new GeckoPrivateModifier();
+}
+
+GeckoPublicModifier::GeckoPublicModifier() {
+    isModifier = true;
+
+    name = "public";
+
+    rules->End();
+}
+
+Keyword* GeckoPublicModifier::New() {
+    return new GeckoPublicModifier();
+}
+
+GeckoProtectedModifier::GeckoProtectedModifier() {
+    isModifier = true;
+
+    name = "protected";
+
+    rules->End();
+}
+
+Keyword* GeckoProtectedModifier::New() {
+    return new GeckoProtectedModifier();
 }

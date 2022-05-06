@@ -24,7 +24,7 @@ std::string generateCodeErrorFromNode(Gecko::lexer_node_t* node) {
 
     r += "\t  " + std::to_string(node->position->line - 1) + "| " + preceeding_line + '\n';
     r += "\t> " + std::to_string(node->position->line) + "| " + line + '\n';
-    r += "\t     " + underline + "\n";
+    r += "\t    " + underline + "\n";
     r += "\t  " + std::to_string(node->position->line + 1) + "| " + next_line + '\n';
 
     r += '\n';

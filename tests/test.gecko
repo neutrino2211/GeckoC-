@@ -50,7 +50,7 @@ if ("H" in "Hello World!") {
 } extra
 
 class sizeable {
-    companion getter size (self: unknown) -> number {
+    static getter size (self: unknown) -> number {
         return std.C.sizeof(self)
     }
 }

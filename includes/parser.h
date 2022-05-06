@@ -4,6 +4,7 @@
 #include "lexer.h"
 #include "keyword.h"
 #include <map>
+#include <iostream>
 
 namespace Gecko {
 
@@ -15,8 +16,9 @@ namespace Gecko {
 
 	private:
 		vector<lexer_node_t*>* mNodes;
-		map<string, Keyword*> keywords;
+		map<string, void*> keywords;
 		map<string, ParserUtils::DirectiveHandler> handlers;
+		vector<Keyword*> activeModifiers;
 
 	public:
 		Parser(vector<lexer_node_t*>* nodes);

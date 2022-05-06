@@ -18,20 +18,25 @@ class KeywordRules {
 
     KeywordRules(Keyword* k);
 
+    std::vector<std::string> GetInstructions();
+
     KeywordRules* Capture(std::string keywordStorageKey);
     KeywordRules* Expect(std::string token);
     KeywordRules* If(std::string token, KeywordRules* rules);
     KeywordRules* Or(std::string token, KeywordRules* rules);
     KeywordRules* EndIf();
     KeywordRules* Next();
+    void End();
     KeywordRules* CaptureBlock(std::string keywordStorageKey);
     KeywordRules* CaptureUntilNext(std::string keywordStorageKey);
 
-    bool Validate(Gecko::lexer_node_t* node);
+
+    bool Validate(Gecko::lexer_node_t& node);
 };
 
 class Keyword {
     public:
+    bool isModifier;
     /* data */
     Keyword() {
         rules = new KeywordRules(this);
@@ -41,9 +46,8 @@ class Keyword {
 
     std::vector<std::vector<std::string>> modifiers;
     std::map<std::string, std::string> data;
+    std::map<std::string, bool> modifierData;
 
-    virtual bool shouldConsume(Gecko::lexer_node_t* node) = 0;
-    virtual void processNode(Gecko::AST::ast_node_t* ast) = 0;
-    virtual bool shouldAwaitCodeBlock() = 0;
+    virtual Keyword* New() = 0;
 };
 #endif

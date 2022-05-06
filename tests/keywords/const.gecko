@@ -1,3 +1,11 @@
 
 const explicit: number = [ 20 + 43 ]
 const implicit = 42
+
+private const access_from_only_this_package: string = "
+    Multiline string
+"
+
+public const access_from_outside_package = "You can access it from other packages"
+
+protected const access_from_other_files_in_package = "package only string"

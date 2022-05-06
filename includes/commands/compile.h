@@ -47,9 +47,16 @@ namespace Commands {
             Gecko::Parser parser(result);
 
             parser.registerKeyword(new GeckoConst);
+            parser.registerKeyword(new GeckoPrivateModifier);
+            parser.registerKeyword(new GeckoPublicModifier);
+            parser.registerKeyword(new GeckoProtectedModifier);
 
             parser.parse();
+
+            printf("After parse\n");
         }
+
+        return;
     };
 }
 
