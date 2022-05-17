@@ -1,9 +1,12 @@
 #include "includes/keywords.h"
+#include "includes/expressions.h"
 
 GeckoConst::GeckoConst() {
     name = "const";
     modifiers = { {"private", "public", "protected"} };
     isModifier = false;
+
+    Gecko::Expressions::ExpressionKeyword* expression = new Gecko::Expressions::ExpressionKeyword;
     // const hello: string = "Hello World"
 
     KeywordRules* implicitRules = new KeywordRules(this);
@@ -11,14 +14,15 @@ GeckoConst::GeckoConst() {
 
     implicitRules
     ->Expect("=")
-    ->CaptureUntilNext("expression")
+    ->Next()
+    ->Branch(expression->rules)
     ->End();
 
     explicitRules
     ->Next()
     ->Capture("type")
     ->Expect("=")
-    ->CaptureUntilNext("expression")
+    ->Branch(expression->rules)
     ->End();
 
     rules

@@ -363,6 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 builddir
+golang/build
 .kdev4
 *.kdev4
 CMakeFiles

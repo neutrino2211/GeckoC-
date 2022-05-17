@@ -1,6 +1,6 @@
 project('Gecko', 'cpp',
           version: '0.0.1',
-    meson_version: '>= 0.53.0',
+    meson_version: '>= 0.57.0',
   default_options: [ 'warning_level=2',
                      'cpp_std=c++17',
                    ],
@@ -24,4 +24,6 @@ gecko_sources = [
     'utils.cpp'
 ]
 
-executable('gecko', gecko_sources, install: true)
+subdir('golang')
+
+executable('gecko', gecko_sources, link_with: go_parser_lib, install: true)

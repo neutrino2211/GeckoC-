@@ -3,18 +3,23 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include "lexer.h"
 #include "ast.h"
 #include "errors.h"
+
+extern map<string, void*>* GECKO_KEYWORDS;
 
 class Keyword;
 
 class KeywordRules {
     std::vector<std::string> instructions;
     std::vector<KeywordRules*> branches;
+    std::vector<std::function<void ()>> ops;
     Keyword* parent;
     Gecko::Error::Scope* error;
     public:
+    bool terminate = false;
 
     KeywordRules(Keyword* k);
 
@@ -24,11 +29,13 @@ class KeywordRules {
     KeywordRules* Expect(std::string token);
     KeywordRules* If(std::string token, KeywordRules* rules);
     KeywordRules* Or(std::string token, KeywordRules* rules);
+    KeywordRules* Else(KeywordRules* rules);
     KeywordRules* EndIf();
     KeywordRules* Next();
+    KeywordRules* Run(std::function<void ()>);
+    KeywordRules* Branch(KeywordRules* rules);
     void End();
     KeywordRules* CaptureBlock(std::string keywordStorageKey);
-    KeywordRules* CaptureUntilNext(std::string keywordStorageKey);
 
 
     bool Validate(Gecko::lexer_node_t& node);

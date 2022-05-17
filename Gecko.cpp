@@ -2,6 +2,7 @@
 //
 
 #include "Gecko.h"
+#include "golang/build/go-parser.h"
 
 using namespace std;
 
@@ -10,6 +11,8 @@ int main(int argc, char** argv)
     Commander* c = new Commander(argc, argv);
 
 	Commands::Compile* compileCommand = new Commands::Compile();
+
+	GoParser("32 + 4 - \"this is a help string\"");
 
 	c->registerCommand("compile", compileCommand);
 	c->parse();

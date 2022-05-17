@@ -1,6 +1,8 @@
 #include "includes/parser.h"
 #include "includes/errors.h"
 
+map<string, void*>* GECKO_KEYWORDS;
+
 Gecko::Error::Scope* scope = new Gecko::Error::Scope("Parser");
 template<typename K, typename V>
 		std::ostream &operator<<(std::ostream &os,
@@ -22,6 +24,7 @@ namespace Gecko {
 
 	void Parser::registerKeyword(Keyword* k) {
 		keywords[k->name] = k;
+		GECKO_KEYWORDS = &keywords;
 	}
 
 	void Parser::parse() {
@@ -100,7 +103,6 @@ namespace Gecko {
 					// Gecko::Utils::printMap<std::string, std::string>(k->data);
 					std::cout << k->data;
 					std::cout << k->modifierData;
-
 					activeModifiers = {};
 				}
 			}

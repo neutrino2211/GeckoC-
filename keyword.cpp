@@ -15,6 +15,13 @@ KeywordRules* KeywordRules::Capture(std::string store) {
     return this;
 }
 
+KeywordRules* KeywordRules::Run(std::function<void ()> operation) {
+    instructions.push_back("r ");
+    ops.push_back(operation);
+
+    return this;
+}
+
 KeywordRules* KeywordRules::Expect(std::string token) {
     instructions.push_back("e " + token);
 
@@ -23,6 +30,13 @@ KeywordRules* KeywordRules::Expect(std::string token) {
 
 KeywordRules* KeywordRules::EndIf() {
     instructions.push_back("x ");
+    return this;
+}
+
+KeywordRules* KeywordRules::Else(KeywordRules* rules) {
+    instructions.push_back("j ");
+    branches.push_back(rules);
+
     return this;
 }
 
@@ -38,6 +52,13 @@ KeywordRules* KeywordRules::If(std::string token, KeywordRules* rules) {
     return this;
 }
 
+KeywordRules* KeywordRules::Branch(KeywordRules* rules) {
+    instructions.push_back("g ");
+    branches.push_back(rules);
+
+    return this;
+}
+
 KeywordRules* KeywordRules::Next() {
     instructions.push_back("n ");
     return this;
@@ -45,12 +66,6 @@ KeywordRules* KeywordRules::Next() {
 
 void KeywordRules::End() {
     instructions.push_back("t ");
-}
-
-KeywordRules* KeywordRules::CaptureUntilNext(std::string store) {
-    instructions.push_back("u " + store);
-
-    return this;
 }
 
 KeywordRules* KeywordRules::CaptureBlock(std::string store) {
@@ -63,12 +78,14 @@ bool KeywordRules::Validate(Gecko::lexer_node_t& node) {
     Gecko::lexer_node_t* l_node = &node; 
     Gecko::lexer_node_t* encounteredErrorNode = nullptr;
     uint16_t branch = 0;
+    uint16_t op_count = 0;
+    Gecko::lexer_position_node_t prev_node_pos = {.column = 0, .line = 0};
     bool evaluateBranches = true;
     
     printf("loop\n");
     for (auto instruction : instructions) {
-        if (encounteredErrorNode != nullptr) break;
-        printf("[%s] [%s] [%i]\n", instruction.c_str(), l_node->value.c_str(), encounteredErrorNode == nullptr);
+        if (encounteredErrorNode != nullptr || terminate) break;
+        printf("[%s] [%s] [%i] [%i]\n", instruction.c_str(), l_node->value.c_str(), l_node->position, encounteredErrorNode == nullptr);
 
         std::string value = instruction.substr(2);
         if (instruction[0] == 's') parent->data[value] = l_node->value;
@@ -80,13 +97,30 @@ bool KeywordRules::Validate(Gecko::lexer_node_t& node) {
                 encounteredErrorNode = &(*l_node); // Copy node for local use
             } else if (value == l_node->value) {
                 auto branch_valid = branches.at(branch)->Validate(*l_node);
-                if(!branch_valid) encounteredErrorNode = &(*l_node);
-                evaluateBranches = false;
+                if(!branch_valid) {
+                    encounteredErrorNode = &(*l_node);
+                    evaluateBranches = false;
+                }
             } else {
                 l_node = l_node->prev;
             }
             branch++;
 
+        } else if (instruction[0] == 'j' && evaluateBranches) {
+            auto branch_valid = branches.at(branch)->Validate(*l_node);
+            if(!branch_valid) {
+                encounteredErrorNode = &(*l_node);
+            };
+            evaluateBranches = false;
+            branch++;
+        } else if (instruction[0] == 'g') {
+            auto branch_valid = branches.at(branch)->Validate(*l_node);
+            if(!branch_valid) {
+                encounteredErrorNode = &(*l_node);
+                evaluateBranches = false;
+            };
+            
+            branch++;
         } else if (instruction[0] == 'x') {
             evaluateBranches = false;
         } else if (instruction[0] == 'b') {
@@ -99,9 +133,18 @@ bool KeywordRules::Validate(Gecko::lexer_node_t& node) {
             if (parent->data[value] == "") {
                 parent->data[value] = l_node->value;
             } else {
-                parent->data[value] += " " + l_node->value;
+                while (l_node != nullptr) {
+                    parent->data[value] += " " + l_node->value;
+                    l_node = l_node->next;
+                }
             }
             printf("end u\n");
+        } else if (instruction[0] == 'r') {
+            printf("got function %i\n", op_count);
+            std::function<void ()> fn = ops.at(op_count);
+            printf("got function %i\n", &fn);
+            fn();
+            op_count++;
         } else if (instruction[0] == 't') {
             node = *l_node;
             printf("endloop\n");
